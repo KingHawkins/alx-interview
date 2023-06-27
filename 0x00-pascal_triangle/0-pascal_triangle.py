@@ -1,4 +1,7 @@
 def pascal_triangle(n):
+    """
+    Calculates the pascal triangle
+    """
     if n <= 0:
         return []
     else:
