@@ -2,6 +2,8 @@
 """
 0-pascal-triangle
 """
+
+
 def pascal_triangle(n):
     """
     Calculates the pascal triangle
