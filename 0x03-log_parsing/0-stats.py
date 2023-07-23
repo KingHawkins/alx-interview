@@ -1,36 +1,48 @@
 #!/usr/bin/python3
 """
-Log parsing.
+module contains a script that reads stdin line by line and computes metrics
 """
-import asyncio
 import sys
-import shlex
 
 
-def log():
-    """
-    Prints the logs every 10 seconds.
-    """
-    size = {"size": 0}
-    statuses = {
-            "200": 0,
-            "301": 0,
-            "400": 0,
-            "401": 0,
-            "403": 0,
-            "404": 0,
-            "405": 0,
-            "500": 0
-    }
-    for line in sys.stdin:
-        status = shlex.split(line.strip())[-2:-1]
-        file_size = shlex.split(line.strip())[-1:]
-        if status[0] in statuses.keys():
-            statuses[status[0]] += 1
-            size["size"] += int(file_size[0])
-            print(f"File size: {size['size']}")
-            for status in statuses:
-                print(f"{status}: {status[0]}")
+status_codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
+
+file_size = 0
 
 
-log()
+def print_metrics():
+    """prints of the logs"""
+    print("File size: {}".format(file_size))
+    for status in sorted(status_codes.keys()):
+        if status_codes[status]:
+            print("{}: {}".format(status, status_codes[status]))
+
+
+if __name__ == "__main__":
+    count = 0
+    try:
+        for line in sys.stdin:
+            try:
+                elems = line.split()
+                file_size += int(elems[-1])
+                if elems[-2] in status_codes:
+                    status_codes[elems[-2]] += 1
+            except Exception:
+                pass
+            if count == 9:
+                print_metrics()
+                count = -1
+            count += 1
+    except KeyboardInterrupt:
+        print_metrics()
+        raise
+    print_metrics()
